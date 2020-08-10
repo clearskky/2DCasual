@@ -5,11 +5,13 @@ using UnityEngine.UI;
 
 public class TouchManager : MonoBehaviour
 {
-    public Text phaseDisplayText;
-    public Text velocityDisplayText;
-    private Touch theTouch;
-    public Vector2 touchStartPosition, touchEndPosition, direction;
     public PlayerCharacter playerCharacter;
+    public Joystick joystick;
+    public Text phaseDisplayText;
+    private Touch theTouch;
+    private Vector2 touchStartPosition, touchEndPosition, lastKnownDirection, JumpDirection;
+    private float x, y;
+    
 
     // Start is called before the first frame update
     void Start()
@@ -19,6 +21,37 @@ public class TouchManager : MonoBehaviour
 
     // Update is called once per frame
     void Update()
+    {
+        HandleTouchInput();
+        //SlingshotPlayer();
+    }
+
+    private void HandleTouchInput()
+    {
+        if (Input.touchCount > 0)
+        {
+            theTouch = Input.GetTouch(0);
+            if (theTouch.phase == TouchPhase.Moved)
+            {
+                lastKnownDirection = joystick.Direction;
+            }
+            else if (theTouch.phase == TouchPhase.Stationary)
+            {
+                lastKnownDirection = joystick.Direction;
+            }
+            else if (theTouch.phase == TouchPhase.Ended)
+            {
+                x = lastKnownDirection.x *(-1);
+                y = lastKnownDirection.y * (-1);
+                JumpDirection = new Vector2(x, y);
+                //Debug.Log(lastKnownDirection);
+                playerCharacter.Jump(JumpDirection);
+            }
+
+            phaseDisplayText.text = theTouch.phase.ToString();
+        }
+    }
+    private void SlingshotPlayer()
     {
         if (Input.touchCount > 0)
         {
@@ -33,14 +66,11 @@ public class TouchManager : MonoBehaviour
 
                 float x = touchStartPosition.x - touchEndPosition.x;
                 float y = touchStartPosition.y - touchEndPosition.y;
-                direction = new Vector2(x, y);
-                playerCharacter.Jump(direction);
+                lastKnownDirection = new Vector2(x, y);
+                playerCharacter.Jump(lastKnownDirection);
             }
-            
+
             phaseDisplayText.text = theTouch.phase.ToString();
-
-            
         }
-
     }
 }

@@ -4,67 +4,58 @@ using UnityEngine;
 
 public class PlayerCharacter : MonoBehaviour
 {
-    public Rigidbody2D rb;
-    public Animator animator;
-    public float JumpForce;
-    public float MaxHorizontalVelocity;
-    public float MaxVerticalVelocity;
-    
-    // Start is called before the first frame update
+    public float JumpForce, DefaultGravity, FallingGravity;
+
+    private Rigidbody2D rigidbody;
+    private Animator animator;
+    private SpriteRenderer spriteRenderer;
+
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        rigidbody = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         AnimatePlayer();
+        ModifyGravity();
+    }
+
+    private void ModifyGravity()
+    {
+
+    }
+
+    public void RotateAfterHittingEnemy()
+    {
+
     }
 
     private void AnimatePlayer()
     {
-        //Vector2 characterScale = transform.localScale;
-        //if (rb.velocity.x < 0)
-        //{
-        //    characterScale.x = -1;
-        //}
-        //if (rb.velocity.x > 0)
-        //{
-        //    characterScale.x = 1;
-        //}
-        //transform.localScale = characterScale;
+        animator.SetFloat("verticalVelocity", rigidbody.velocity.y);
+        animator.SetFloat("horizontalVelocity", rigidbody.velocity.x);
 
-        animator.SetFloat("verticalVelocity", rb.velocity.y);
-        animator.SetFloat("horizontalVelocity", rb.velocity.x);
+        if (rigidbody.velocity.x < -0.1)
+        {
+            spriteRenderer.flipX = true;
+        }
+        else if (rigidbody.velocity.x > 0.1)
+        {
+            spriteRenderer.flipX = false;
+        }
     }
 
     public void Jump(Vector2 direction)
     {
-        rb.AddForce(direction * JumpForce, ForceMode2D.Impulse);
+        Debug.Log("My people need me");
+        rigidbody.AddForce(direction * JumpForce, ForceMode2D.Impulse);
     }
 
-    private Vector2 NormalizeJumpVelocity(Vector2 velocity)
+    void OnCollisionEnter(Collision collision)
     {
-        if (velocity.x > MaxHorizontalVelocity)
-        {
-            velocity.x = MaxHorizontalVelocity;
-        }
-        else if (velocity.x < (MaxHorizontalVelocity * (-1)))
-        {
-            velocity.x = (MaxHorizontalVelocity * (-1));
-        }
 
-        if (velocity.y > MaxVerticalVelocity)
-        {
-            velocity.y = MaxVerticalVelocity;
-        }
-        else if (velocity.y < (MaxVerticalVelocity * (-1)))
-        {
-            velocity.y = (MaxVerticalVelocity * (-1));
-        }
-        Debug.Log(velocity);
-        return velocity;
     }
 }
