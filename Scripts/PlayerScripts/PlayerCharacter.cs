@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerCharacter : MonoBehaviour
 {
     public float JumpForce, DefaultGravity, FallingGravity;
+    public int MaxJumpCount, CurrentJumpCount;
 
     private Rigidbody2D rigidbody;
     private Animator animator;
@@ -15,19 +16,15 @@ public class PlayerCharacter : MonoBehaviour
         rigidbody = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+        CurrentJumpCount = MaxJumpCount;
     }
 
     void Update()
     {
         AnimatePlayer();
-        ModifyGravity();
     }
 
-    private void ModifyGravity()
-    {
-
-    }
-
+    // Rotate player to the enemy after colliding with it.
     public void RotateAfterHittingEnemy()
     {
 
@@ -48,14 +45,19 @@ public class PlayerCharacter : MonoBehaviour
         }
     }
 
+    // This method is called by TouchManager.
     public void Jump(Vector2 direction)
     {
-        Debug.Log("My people need me");
-        rigidbody.AddForce(direction * JumpForce, ForceMode2D.Impulse);
-    }
-
-    void OnCollisionEnter(Collision collision)
-    {
-
+        if (CurrentJumpCount > 0)
+        {
+            Debug.Log("My people need me");
+            CurrentJumpCount -= 1;
+            rigidbody.AddForce(direction * JumpForce, ForceMode2D.Impulse);
+        }
+        else
+        {
+            Debug.Log("Can't jump.");
+        }
+        
     }
 }
