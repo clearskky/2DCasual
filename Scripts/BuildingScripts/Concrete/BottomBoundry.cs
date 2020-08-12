@@ -9,7 +9,6 @@ public class BottomBoundry : MonoBehaviour, IBoundry
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
-        player.CurrentJumpCount = player.MaxJumpCount;
-        playerRB.velocity = Vector2.zero;
+
     }
 }
