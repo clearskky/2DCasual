@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-interface IBuildingWing
+public interface IManager
 {
-    void RegisterDamage(int damage);
+
 }

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class TouchManager : MonoBehaviour, IInputHandler
 {
-    public PlayerCharacter playerCharacter;
+    //public PlayerCharacter playerCharacter;
     public Joystick joystick;
     public Text phaseDisplayText;
     private Touch theTouch;
@@ -37,7 +37,7 @@ public class TouchManager : MonoBehaviour, IInputHandler
                 x = lastKnownDirection.x *(-1);
                 y = lastKnownDirection.y * (-1);
                 JumpDirection = new Vector2(x, y);
-                playerCharacter.Jump(JumpDirection);
+                PlayerCharacter.Instance.Jump(JumpDirection);
             }
 
             phaseDisplayText.text = theTouch.phase.ToString();

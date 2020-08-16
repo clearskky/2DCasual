@@ -14,9 +14,4 @@ public class CastleWing : MonoBehaviour, IBuildingWing
     {
         castle.TakeDamage(damage);
     }
-
-    public void OnCollisionEnter2D(Collision2D collision)
-    {
-        throw new System.NotImplementedException();
-    }
 }

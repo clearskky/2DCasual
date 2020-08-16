@@ -1,31 +1,42 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+//using UnityEngine.XR.WSA.Persistence;
 
-public class PlayerCharacter : MonoBehaviour
+public class PlayerCharacter : MonoBehaviour, IPlayer
 {
-    public float JumpForce, DefaultGravity, FallingGravity;
+
+    private static PlayerCharacter _instance;
+    public static PlayerCharacter Instance { get{ return _instance; }}
+
+    public int JumpForce, BounceBackForce;
     public int raycastDistance;
     public int MaxJumpCount, CurrentJumpCount;
+    public int AttackDamage;
 
     [SerializeField] private bool isGrounded = true;
-    private RaycastHit2D raycastHit2D;
-    private Rigidbody2D rigidbody;
-    private Animator animator;
-    private SpriteRenderer spriteRenderer;
+    private RaycastHit2D _raycastHit2D;
+    private Rigidbody2D _rigidbody;
+    private Animator _animator;
+    private SpriteRenderer _spriteRenderer;
 
     void Start()
     {
-        rigidbody = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        animator = GetComponent<Animator>();
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+
+        _rigidbody = GetComponent<Rigidbody2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _animator = GetComponent<Animator>();
         CurrentJumpCount = MaxJumpCount;
     }
 
-    void Update()
-    {
-
-    }
 
     void FixedUpdate()
     {
@@ -34,9 +45,16 @@ public class PlayerCharacter : MonoBehaviour
     }
 
     // Rotate player to the enemy after colliding with it.
-    public void RotateAfterHittingEnemy()
+    public void RotateBeforeHittingEnemy(float enemyPosX)
     {
-
+        if (transform.position.x < enemyPosX)
+        {
+            _spriteRenderer.flipX = false;
+        }
+        else
+        {
+            _spriteRenderer.flipX = true;
+        }
     }
 
     // Start looking at the player's feet via raycast after a delay
@@ -46,7 +64,8 @@ public class PlayerCharacter : MonoBehaviour
         if (isGrounded == false)
         {
             yield return new WaitForSeconds(0.1f); // The delay is adjusted here
-            Debug.DrawRay(transform.position, -Vector2.up * raycastDistance, Color.red);
+            
+            //Debug.DrawRay(transform.position, -Vector2.up * raycastDistance, Color.red);
 
             // The layer we want the raycast to collide with is the 12th layer so we create an appropriate layermask by performing a shifting operation.
             int bitmask = 1 << 12;
@@ -56,25 +75,25 @@ public class PlayerCharacter : MonoBehaviour
             {
                 isGrounded = true;
                 CurrentJumpCount = MaxJumpCount;
-                rigidbody.velocity = Vector2.zero;
+                _rigidbody.velocity = Vector2.zero; // We don't want the player to slide around after landing on solid ground
             }
         }
         
     }
 
-    private void AnimatePlayer()
+    public void AnimatePlayer()
     {
-        animator.SetFloat("verticalVelocity", rigidbody.velocity.y);
-        animator.SetFloat("horizontalVelocity", rigidbody.velocity.x);
+        _animator.SetFloat("verticalVelocity", _rigidbody.velocity.y);
+        _animator.SetFloat("horizontalVelocity", _rigidbody.velocity.x);
 
         // Flip the sprite vertically if the player is accelerating towards left
-        if (rigidbody.velocity.x < -0.1)
+        if (_rigidbody.velocity.x < -0.1)
         {
-            spriteRenderer.flipX = true;
+            _spriteRenderer.flipX = true;
         }
-        else if (rigidbody.velocity.x > 0.1)
+        else if (_rigidbody.velocity.x > 0.1)
         {
-            spriteRenderer.flipX = false;
+            _spriteRenderer.flipX = false;
         }
     }
 
@@ -86,12 +105,42 @@ public class PlayerCharacter : MonoBehaviour
             Debug.Log("My people need me");
             isGrounded = false;
             CurrentJumpCount -= 1;
-            rigidbody.AddForce(direction * JumpForce, ForceMode2D.Impulse);
+            _rigidbody.AddForce(direction * JumpForce, ForceMode2D.Impulse);
         }
-        else
+
+    }
+
+    public void StopAttacking()
+    {
+        _animator.SetBool("isAttacking", false);
+    }
+
+    public void StartAttacking()
+    {
+        _animator.SetBool("isAttacking", true);
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        AttackCollidedEnemy(collision);
+    }
+
+    private void AttackCollidedEnemy(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "enemy")
         {
-            Debug.Log("Can't jump.");
+            RotateBeforeHittingEnemy(collision.gameObject.transform.position.x);
+            StartAttacking();
+            StartCoroutine(BouncePlayerAwayFromEnemy(collision, 0.1f));
+
+            IEnemy enemy = collision.gameObject.GetComponent<IEnemy>();
+            enemy.TakeDamage(AttackDamage);
         }
-        
+    }
+
+    private IEnumerator BouncePlayerAwayFromEnemy(Collision2D collision, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        _rigidbody.AddForce(collision.contacts[0].normal * BounceBackForce, ForceMode2D.Impulse);
     }
 }

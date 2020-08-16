@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-interface IBuildingWing
+public interface IPlayer
 {
-    void RegisterDamage(int damage);
+    void Jump(Vector2 direction);
+    void AnimatePlayer();
 }
