@@ -7,7 +7,7 @@ public class PlayerCharacter : MonoBehaviour, IPlayer
 {
 
     private static PlayerCharacter _instance;
-    public static PlayerCharacter Instance { get{ return _instance; }}
+    public static PlayerCharacter Instance {get {return _instance;}}
 
     public int JumpForce, BounceBackForce;
     public int raycastDistance;
@@ -38,7 +38,7 @@ public class PlayerCharacter : MonoBehaviour, IPlayer
     }
 
 
-    void FixedUpdate()
+    void Update()
     {
         StartCoroutine(CheckIfGrounded());
         AnimatePlayer();
@@ -59,7 +59,7 @@ public class PlayerCharacter : MonoBehaviour, IPlayer
 
     // Start looking at the player's feet via raycast after a delay
     // Without this delay the player's velocity is made zero the instant the player jumps.
-    IEnumerator CheckIfGrounded()
+    public IEnumerator CheckIfGrounded()
     {
         if (isGrounded == false)
         {

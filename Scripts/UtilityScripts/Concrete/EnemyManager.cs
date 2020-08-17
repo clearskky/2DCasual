@@ -5,16 +5,22 @@ using UnityEngine;
 public class EnemyManager : MonoBehaviour, IManager
 {
     private static EnemyManager _instance;
-    public static EnemyManager Instance;
+    public static EnemyManager Instance {get {return _instance;}}
 
-    public IEnemy pfab_FlyingEye;
-    public IEnemy pfab_Scroller;
+    public GameObject pfab_FlyingEye;
+    public GameObject pfab_Scroller;
 
-    public float TimeBetweenFlyingEyeSpawns, TimeOfLastFlyingEyeSpawn;
-    public float TimeBetweenScrollerSpawns, TimeOfLastScrollerSpawn;
+    public float TimeBetweenFlyingEyeSpawns; 
+    private float _timeOfLastFlyingEyeSpawn;
 
-    public int MaxFlyingEyeCount, CurrentFlyingEyeCount;
-    public int MaxScrollerCount, CurrentScrollerCount;
+    public float TimeBetweenScrollerSpawns;
+    private float _timeOfLastScrollerSpawn;
+
+    public int MaxFlyingEyeCount;
+    private int _currentFlyingEyeCount;
+
+    public int MaxScrollerCount; //Scroller is a type of enemy. It may or may not already be in the game depending on when you're reading this.
+    private int _currentScrollerCount;
 
     void Start()
     {
@@ -31,27 +37,28 @@ public class EnemyManager : MonoBehaviour, IManager
     void Update()
     {
         ManageEnemySpawns();
-        IncrementRespawnTimers();
+        //IncrementRespawnTimers();
     }
 
     public void ManageEnemySpawns()
     {
-        if (Time.time > (TimeOfLastFlyingEyeSpawn + TimeBetweenFlyingEyeSpawns) && CurrentFlyingEyeCount < MaxFlyingEyeCount)
+
+        SpawnFlyingEye();
+    }
+
+    public void SpawnFlyingEye()
+    {
+        if ((_currentFlyingEyeCount < MaxFlyingEyeCount) && (Time.time > (_timeOfLastFlyingEyeSpawn + TimeBetweenFlyingEyeSpawns)))
         {
-            SpawnEnemy<FlyingEye>(pfab_FlyingEye);
+            GameObject.Instantiate(pfab_FlyingEye, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.Euler(0, 0, 0), gameObject.transform);
+            _currentFlyingEyeCount += 1;
+            _timeOfLastFlyingEyeSpawn = Time.time;
         }
+        
     }
 
-    public void IncrementRespawnTimers()
-    {
-
-    }
-
-    public void SpawnEnemy<EnemyType>(IEnemy enemyPrefab) where EnemyType : MonoBehaviour
-    {
-        GameObject.Instantiate((EnemyType)enemyPrefab, new Vector2(transform.position.x, transform.position.y), Quaternion.Euler(0,0,0));
-    }
-
+    // All enemies are children of the EnemyManager in the hierarchy
+    // EnemyManager kills all of its children with this method. Might be useful for a future powerup.
     public void DestroyAllEnemies()
     {
         for (int childIndex = 0; childIndex < transform.childCount; childIndex++)
@@ -59,5 +66,15 @@ public class EnemyManager : MonoBehaviour, IManager
             IEnemy child = transform.GetChild(childIndex).GetComponent<IEnemy>();
             child.InitiateDeathRoutine();
         }
+    }
+
+    public void DecrementCurrentFlyingEyeCount()
+    {
+        _currentFlyingEyeCount -= 1;
+    }
+
+    public void DecrementCurrentScrollerCount()
+    {
+        _currentScrollerCount -= 1;
     }
 }

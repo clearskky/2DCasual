@@ -8,7 +8,7 @@ public class FlyingEye : MonoBehaviour, IEnemy
     public int MoveSpeed;
     public int AttackDamage;
 
-    [SerializeField] private Transform _BuildingWingContainer;
+    [SerializeField] private Transform _buildingWingContainer;
     private bool isAlive;
     private Animator _animator;
     private Transform _targetBuildingWing;
@@ -30,8 +30,9 @@ public class FlyingEye : MonoBehaviour, IEnemy
 
     private Transform DetermineTargetWing()
     {
-        int childIndex = Random.Range(0, _BuildingWingContainer.childCount);
-        return _BuildingWingContainer.GetChild(childIndex);
+        int childIndex = Random.Range(0, _buildingWingContainer.childCount);
+        Debug.Log("My name is " + transform.name + "I have chosen " + _buildingWingContainer.GetChild(childIndex).name + " as my target at position: " + _buildingWingContainer.GetChild(childIndex).position);
+        return _buildingWingContainer.GetChild(childIndex);
     }
 
     public void TakeDamage(int damage)
@@ -54,12 +55,14 @@ public class FlyingEye : MonoBehaviour, IEnemy
     }
 
     // The animation event at the end of the death animation executes this method, killing the FlyingEye
+    // We let the EnemyManager know of this tragedy so it can send reinforcements
     public void Die()
     {
+        EnemyManager.Instance.DecrementCurrentFlyingEyeCount();
         Destroy(gameObject);
     }
 
-    // Heals the enemy by a percentage of its max health
+    // Heals this unit by a percentage of its max health
     public void GetHealed(int healPercentage)
     {
         CurrentHealth += (MaxHealth / 100) * healPercentage;
@@ -80,6 +83,7 @@ public class FlyingEye : MonoBehaviour, IEnemy
         }
     }
 
+    // Moves the FlyingEye towards the designated CastleWing
     public void MoveTowardsTarget()
     {
         if (isAlive)
