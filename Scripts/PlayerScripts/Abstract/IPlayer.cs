@@ -6,4 +6,8 @@ public interface IPlayer
 {
     void Jump(Vector2 direction);
     void AnimatePlayer();
+
+    IEnumerator CheckIfGrounded();
+    void StartAttacking();
+    void StopAttacking();
 }

@@ -7,13 +7,17 @@ public class TouchManager : MonoBehaviour, IInputHandler
 {
     //public PlayerCharacter playerCharacter;
     public Joystick joystick;
-    public Text phaseDisplayText;
+    //public Text phaseDisplayText;
     private Touch theTouch;
     private Vector2 touchStartPosition, touchEndPosition, lastKnownDirection, JumpDirection;
     private float x, y;
+    private int controlDirection;
 
+    void Start()
+    {
+        controlDirection = PlayerPrefs.GetInt("controlDirection", 1);
+    }
 
-    // Update is called once per frame
     void Update()
     {
         HandleInput();
@@ -34,13 +38,23 @@ public class TouchManager : MonoBehaviour, IInputHandler
             }
             else if (theTouch.phase == TouchPhase.Ended)
             {
-                x = lastKnownDirection.x *(-1);
-                y = lastKnownDirection.y * (-1);
+                x = lastKnownDirection.x * controlDirection;
+                y = lastKnownDirection.y * controlDirection;
                 JumpDirection = new Vector2(x, y);
-                PlayerCharacter.Instance.Jump(JumpDirection);
+
+                if (JumpDirection != Vector2.zero)
+                {
+                    Debug.Log(controlDirection);
+                    PlayerCharacter.Instance.Jump(JumpDirection);
+                }
             }
 
-            phaseDisplayText.text = theTouch.phase.ToString();
+            //phaseDisplayText.text = theTouch.phase.ToString();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            GameEventManager.Instance.TogglePauseMenu();
         }
     }
 }
