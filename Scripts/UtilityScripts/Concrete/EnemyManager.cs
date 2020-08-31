@@ -10,19 +10,21 @@ public class EnemyManager : MonoBehaviour, IManager
     public GameObject pfab_FlyingEye;
     public GameObject pfab_Scroller;
 
-    public float TimeBetweenFlyingEyeSpawns; 
-    private float _timeOfLastFlyingEyeSpawn;
+    public int spawnAreaXAxisSemidiameter, spawnAreaYAxisSemidiameter;
 
-    public float TimeBetweenScrollerSpawns;
-    private float _timeOfLastScrollerSpawn;
+    public float timeBetweenFlyingEyeSpawns; 
+    private float timeOfLastFlyingEyeSpawn;
 
-    public int MaxFlyingEyeCount;
-    private int _currentFlyingEyeCount;
+    public float timeBetweenScrollerSpawns;
+    private float timeOfLastScrollerSpawn;
 
-    public int MaxScrollerCount; //Scroller is a type of enemy. It may or may not already be in the game depending on when you're reading this.
-    private int _currentScrollerCount;
+    public int maxFlyingEyeCount;
+    [SerializeField] private int currentFlyingEyeCount;
 
-    void Start()
+    public int maxScrollerCount; //Scroller is a type of enemy. It may or may not already be in the game depending on when you're reading this.
+    [SerializeField] private int currentScrollerCount;
+
+    void Awake()
     {
         if (_instance != null && _instance != this)
         {
@@ -37,24 +39,42 @@ public class EnemyManager : MonoBehaviour, IManager
     void Update()
     {
         ManageEnemySpawns();
-        //IncrementRespawnTimers();
     }
 
     public void ManageEnemySpawns()
     {
-
-        SpawnFlyingEye();
+        SpawnFlyingEyes();
+        SpawnScrollers();
     }
 
-    public void SpawnFlyingEye()
+    public void SpawnFlyingEyes()
     {
-        if ((_currentFlyingEyeCount < MaxFlyingEyeCount) && (Time.time > (_timeOfLastFlyingEyeSpawn + TimeBetweenFlyingEyeSpawns)))
+        if ((currentFlyingEyeCount < maxFlyingEyeCount) && ((Time.time > (timeOfLastFlyingEyeSpawn + timeBetweenFlyingEyeSpawns)) || (currentFlyingEyeCount <= 0)))
         {
-            GameObject.Instantiate(pfab_FlyingEye, new Vector3(transform.position.x, transform.position.y, transform.position.z), Quaternion.Euler(0, 0, 0), gameObject.transform);
-            _currentFlyingEyeCount += 1;
-            _timeOfLastFlyingEyeSpawn = Time.time;
+            GameObject.Instantiate(pfab_FlyingEye, DetermineSpawnPosition(), Quaternion.Euler(0, 0, 0), gameObject.transform);
+            currentFlyingEyeCount += 1;
+            timeOfLastFlyingEyeSpawn = Time.time;
         }
-        
+    }
+
+    public void SpawnScrollers()
+    {
+        if ((currentScrollerCount < maxScrollerCount) && (Time.time > (timeOfLastScrollerSpawn + timeBetweenScrollerSpawns)))
+        {
+            GameObject.Instantiate(pfab_Scroller, DetermineSpawnPosition(), Quaternion.Euler(0, 0, 0), gameObject.transform);
+            currentScrollerCount += 1;
+            timeOfLastScrollerSpawn = Time.time;
+        }
+    }
+
+    public Vector3 DetermineSpawnPosition()
+    {
+        float posX = Random.Range(transform.position.x - spawnAreaXAxisSemidiameter,
+            transform.position.x + spawnAreaXAxisSemidiameter);
+        float posY = Random.Range(transform.position.y - spawnAreaYAxisSemidiameter,
+            transform.position.y + spawnAreaYAxisSemidiameter);
+
+        return new Vector3(posX, posY, transform.position.z);
     }
 
     // All enemies are children of the EnemyManager in the hierarchy
@@ -70,11 +90,11 @@ public class EnemyManager : MonoBehaviour, IManager
 
     public void DecrementCurrentFlyingEyeCount()
     {
-        _currentFlyingEyeCount -= 1;
+        currentFlyingEyeCount -= 1;
     }
 
     public void DecrementCurrentScrollerCount()
     {
-        _currentScrollerCount -= 1;
+        currentScrollerCount -= 1;
     }
 }

@@ -5,8 +5,7 @@ using UnityEngine;
 public interface IEnemy
 {
     void TakeDamage(int damage);
-
-    void InitiateDeathRoutine();
+    void InitiateDeathRoutine(string sourceOfDeathTag = null);
     void Die();
     void GetHealed(int healPercentage);
 }

@@ -6,11 +6,8 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class SideBoundry : MonoBehaviour, IBoundry
 {
-    //public PlayerCharacter Player;
     public float PushForce;
     private Vector2 PushDirection;
-
-    
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
@@ -19,6 +16,6 @@ public class SideBoundry : MonoBehaviour, IBoundry
 
         Rigidbody2D playerRB = PlayerCharacter.Instance.GetComponent<Rigidbody2D>();
         playerRB.AddForce(PushDirection * PushForce, ForceMode2D.Impulse);
-        Debug.Log("Back off");
+        AudioManager.Instance.PlayPlayerBoundryBounceBackClip();
     }
 }
