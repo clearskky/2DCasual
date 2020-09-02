@@ -131,7 +131,7 @@ public class GameEventManager : MonoBehaviour, IManager
         {
             AddMana(-bladeworksManaCost);
             powerupInstance =
-                GameObject.Instantiate(pfab_bladeworksPortal, new Vector3(490, -325, 1),
+                GameObject.Instantiate(pfab_bladeworksPortal, new Vector3((Screen.width / 2), -325, 1),
                     Quaternion.identity); // 490 -360
         }
         else
@@ -182,11 +182,13 @@ public class GameEventManager : MonoBehaviour, IManager
         if (!isGamePaused)
         {
             ToggleFreezeGame();
+            AudioManager.Instance.musicAudioSource.Stop();
             CanvasManager.Instance.EnableSpecificPanel(TogglablePanelType.Pause);
         }
         else
         {
             CanvasManager.Instance.DisableLastActivePanel();
+            AudioManager.Instance.musicAudioSource.Play();
             ToggleFreezeGame();
         }
     }
@@ -195,20 +197,21 @@ public class GameEventManager : MonoBehaviour, IManager
     {
         if (isGamePaused)
         {
-            Time.timeScale = 1;
             isGamePaused = false;
+            Time.timeScale = 1;
+            
         }
         else
         {
-            Time.timeScale = 0;
             isGamePaused = true;
+            Time.timeScale = 0;
         }
     }
 
     public void InitiateGameOverRoutine()
     {
-
-        FreezeTime(1.5f);
+        AudioManager.Instance.musicAudioSource.Stop();
+        AudioManager.Instance.PlayDefeatClip();
         ToggleFreezeGame();
         CanvasManager.Instance.EnableSpecificPanel(TogglablePanelType.EndGame);
     }

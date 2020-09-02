@@ -44,17 +44,11 @@ public class TouchManager : MonoBehaviour, IInputHandler
 
                 if (JumpDirection != Vector2.zero)
                 {
-                    Debug.Log(controlDirection);
                     PlayerCharacter.Instance.Jump(JumpDirection);
                 }
             }
 
             //phaseDisplayText.text = theTouch.phase.ToString();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            GameEventManager.Instance.TogglePauseMenu();
         }
     }
 }

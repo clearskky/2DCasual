@@ -150,8 +150,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   currentHealth: 0
-  movementSpeed: 165
-  attackDamage: 30
+  movementSpeed: 175
+  attackDamage: 35
   scoreValue: 500
   buildingWingContainer: {fileID: 4978104886993891964, guid: 6d6f3e9edeb0218439bf398f309eb6a8, type: 3}
 --- !u!50 &8875332450945762019

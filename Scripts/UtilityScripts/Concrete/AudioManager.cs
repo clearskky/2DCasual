@@ -1,10 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 
 public class AudioManager : MonoBehaviour, IManager
 {
     public AudioSource sfxAudioSource, musicAudioSource;
+    public AudioMixer sfxAudioMixer, musicAudioMixer;
 
     [Header("Player Clips")]
     public AudioClip jumpClip, playerBoundryBounceBackClip, addedManaClip;
@@ -16,7 +19,7 @@ public class AudioManager : MonoBehaviour, IManager
     public AudioClip bladeworksActivationClip, magmaCleaverActivationClip, jumpBoostActivationClip;
 
     [Header("UI Clips")]
-    public AudioClip invalidActionClip, defeatClip;
+    public AudioClip mainMenuMusicClip, gameplayMusicClip, invalidActionClip, defeatClip, buttonHitClip;
 
     // Singleton Implementation
     private static AudioManager _instance;
@@ -31,6 +34,25 @@ public class AudioManager : MonoBehaviour, IManager
         else
         {
             _instance = this;
+        }
+    }
+
+    void Start()
+    {
+        musicAudioMixer.SetFloat("musicVol", PlayerPrefs.GetFloat("musicVol"));
+        sfxAudioMixer.SetFloat("sfxVol", PlayerPrefs.GetFloat("sfxVol"));
+
+        if (SceneManager.GetActiveScene().name == "MainMenu")
+        {
+            musicAudioSource.clip = mainMenuMusicClip;
+            musicAudioSource.Play();
+            musicAudioSource.loop = true;
+        }
+        else
+        {
+            musicAudioSource.clip = gameplayMusicClip;
+            musicAudioSource.Play();
+            musicAudioSource.loop = true;
         }
     }
 
@@ -83,5 +105,9 @@ public class AudioManager : MonoBehaviour, IManager
     {
         sfxAudioSource.PlayOneShot(defeatClip);
     }
-    
+
+    public void PlayButtonHitClip()
+    {
+        sfxAudioSource.PlayOneShot(buttonHitClip);
+    }
 }

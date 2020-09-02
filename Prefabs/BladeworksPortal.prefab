@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pfab_spiritBlade: {fileID: 9112136916347876476, guid: ccdaa475fdd0ce041a6195f01b37272f, type: 3}
-  numberOfSwordsToSpawn: 10
-  spawnAreaXAxisSemidiameter: 800
+  maxNumberOfSwordsToSpawn: 7
+  spawnAreaXAxisSemidiameter: 539
   spawnAreaYAxisSemidiameter: 100
   timeBetweenSwordSpawns: 0.2
