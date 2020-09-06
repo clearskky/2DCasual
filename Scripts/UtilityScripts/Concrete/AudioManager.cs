@@ -9,8 +9,12 @@ public class AudioManager : MonoBehaviour, IManager
     public AudioSource sfxAudioSource, musicAudioSource;
     public AudioMixer sfxAudioMixer, musicAudioMixer;
 
-    [Header("Player Clips")]
-    public AudioClip jumpClip, playerBoundryBounceBackClip, addedManaClip;
+    [Header("Player Clips")] 
+    public AudioClip jumpClip, playerBoundryBounceBackClip, swordHitClip;
+
+    [Header("Mana Clips")]
+    public AudioClip manaLvl1Clip, manaLvl2Clip, manaLvl3Clip, manaLvl4Clip;
+    public int manaLvl2Threshold, manaLvl3Threshold, manaLvl4Threshold;
 
     [Header("Enemy Clips")]
     public AudioClip scrollerDeathClip, flyingEyeDeathClip;
@@ -66,9 +70,24 @@ public class AudioManager : MonoBehaviour, IManager
         sfxAudioSource.PlayOneShot(playerBoundryBounceBackClip);
     }
 
-    public void PlayAddedManaClip()
+    public void PlayAddedManaClip(int manaAmount)
     {
-        sfxAudioSource.PlayOneShot(addedManaClip);
+        if (manaAmount >= manaLvl4Threshold)
+        {
+            sfxAudioSource.PlayOneShot(manaLvl4Clip);
+        }
+        else if (manaAmount >= manaLvl3Threshold)
+        {
+            sfxAudioSource.PlayOneShot(manaLvl3Clip);
+        }
+        else if (manaAmount >= manaLvl2Threshold)
+        {
+            sfxAudioSource.PlayOneShot(manaLvl2Clip);
+        }
+        else
+        {
+            sfxAudioSource.PlayOneShot(manaLvl1Clip);
+        }
     }
 
     public void PlayScrollerDeathClip()
@@ -109,5 +128,10 @@ public class AudioManager : MonoBehaviour, IManager
     public void PlayButtonHitClip()
     {
         sfxAudioSource.PlayOneShot(buttonHitClip);
+    }
+
+    public void PlayIzanagiSwordClip()
+    {
+        sfxAudioSource.PlayOneShot(swordHitClip);
     }
 }

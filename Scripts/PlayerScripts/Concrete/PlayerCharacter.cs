@@ -31,7 +31,8 @@ public class PlayerCharacter : MonoBehaviour, IPlayer
     public Animator animator;
     public Transform targetEnemyTransform;
     public bool isAttacking;
-    
+
+    public DamageSource damageType;
 
     void Awake()
     {
@@ -107,7 +108,7 @@ public class PlayerCharacter : MonoBehaviour, IPlayer
         {
             isAttacking = true;
             animator.SetTrigger("Attack");
-            //animator.SetBool("isAttacking", true);
+            AudioManager.Instance.PlayIzanagiSwordClip();
         }
     }
 
@@ -118,14 +119,14 @@ public class PlayerCharacter : MonoBehaviour, IPlayer
             //Debug.Log("Attack Animation Started");
             IEnemy enemy = targetEnemyTransform.GetComponent<IEnemy>();
             DamageSpecifiedEnemy(enemy);
-            StartCoroutine(GameEventManager.Instance.FreezeTime(0.05f));
+            StartCoroutine(GameEventManager.Instance.FreezeTime(0.1f));
         }
     }
 
     private void DamageSpecifiedEnemy(IEnemy enemy)
     {
         BouncePlayerAwayFromTargetEnemy();
-        enemy.TakeDamage(attackDamage);
+        enemy.TakeDamage(attackDamage, damageType);
         isAttacking = false;
         targetEnemyTransform = null;
         //Debug.Log("Target Enemy has been damaged");

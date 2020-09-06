@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-interface IButtonController
+public interface IButtonController
 {
     void OnButtonClicked();
 }

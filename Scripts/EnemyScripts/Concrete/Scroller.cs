@@ -16,6 +16,8 @@ public class Scroller : MonoBehaviour, IEnemy
     private float remainingDistanceBeforeScrolling;
     private SpriteRenderer spriteRenderer;
 
+    public DamageSource sourceOfLastTakenDamage;
+
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -80,13 +82,14 @@ public class Scroller : MonoBehaviour, IEnemy
         }
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(int damage, DamageSource damageSource)
     {
         currentHealth -= damage;
+        sourceOfLastTakenDamage = damageSource;
 
         if (currentHealth <= 0)
         {
-            InitiateDeathRoutine(null);
+            InitiateDeathRoutine();
         }
     }
 
@@ -97,17 +100,26 @@ public class Scroller : MonoBehaviour, IEnemy
             IBuildingWing buildingWing = collision.gameObject.GetComponent<CastleWing>();
             buildingWing.RegisterDamage(attackDamage);
 
-            InitiateDeathRoutine("castleWing");
+            TakeDamage(maxHealth * 3, DamageSource.CWing);
         }
     }
 
     // This sets off the death animation
-    public void InitiateDeathRoutine(string sourceOfDeathTag)
+    public void InitiateDeathRoutine()
     {
-        AudioManager.Instance.PlayScrollerDeathClip();
-
-        if (sourceOfDeathTag != "castleWing")
+        if (sourceOfLastTakenDamage == DamageSource.CWing)
         {
+            AudioManager.Instance.PlayFlyingEyeDeathClip();
+
+        }
+        else if (sourceOfLastTakenDamage == DamageSource.Powerup)
+        {
+            AudioManager.Instance.PlayFlyingEyeDeathClip();
+            GameEventManager.Instance.IncreaseScore(scoreValue);
+        }
+        else if (sourceOfLastTakenDamage == DamageSource.Player)
+        {
+            AudioManager.Instance.PlayIzanagiSwordClip();
             PlayerCharacter.Instance.enemiesKilledBeforeFalling += 1;
             GameEventManager.Instance.IncreaseScore(scoreValue * PlayerCharacter.Instance.enemiesKilledBeforeFalling);
         }

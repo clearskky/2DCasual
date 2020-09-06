@@ -84,7 +84,7 @@ public class EnemyManager : MonoBehaviour, IManager
         for (int childIndex = 0; childIndex < transform.childCount; childIndex++)
         {
             IEnemy child = transform.GetChild(childIndex).GetComponent<IEnemy>();
-            child.InitiateDeathRoutine();
+            child.Die();
         }
     }
 

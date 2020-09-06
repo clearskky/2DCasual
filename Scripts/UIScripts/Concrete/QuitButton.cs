@@ -24,6 +24,7 @@ public class QuitButton : MonoBehaviour, IButtonController
         }
         else
         {
+            Time.timeScale = 1;
             SceneManager.LoadScene("MainMenu");
         }
     }

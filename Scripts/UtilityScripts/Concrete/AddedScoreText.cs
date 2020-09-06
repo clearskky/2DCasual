@@ -14,7 +14,7 @@ public class AddedScoreText : MonoBehaviour, IFloatingText
 
     void Awake()
     {
-        transform.position = new Vector3(transform.parent.position.x, transform.parent.position.y - distanceToFloat, transform.parent.position.z);
+        //transform.position = new Vector3(transform.parent.position.x, transform.parent.position.y + 75, transform.parent.position.z); //Vector3(transform.parent.position.x, transform.parent.position.y - distanceToFloat, transform.parent.position.z);
         remainingDistanceBeforeDying = distanceToFloat;
     }
 
