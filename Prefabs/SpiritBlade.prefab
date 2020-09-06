@@ -124,4 +124,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackDamage: 500
   movementSpeed: 4000
-  damageType: 1

@@ -15,9 +15,8 @@ public class CompleteTutorialButton : MonoBehaviour, IButtonController
 
     public void OnButtonClicked()
     {
-        AudioManager.Instance.PlayButtonHitClip();
-        PlayerPrefs.SetInt("sessionCounter", PlayerPrefs.GetInt("sessionCounter", 0) + 1); // If the player hasn't reached session count 5, increment it
         Time.timeScale = 1;
+        AudioManager.Instance.PlayButtonHitClip();
         PlayerPrefs.SetInt("tutorialHasBeenCompleted", 1);
         SceneManager.LoadScene("SampleScene");
     }

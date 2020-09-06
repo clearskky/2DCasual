@@ -14,12 +14,6 @@ public class GameEventManager : MonoBehaviour, IManager
         get { return _instance; }
     }
 
-    public Castle castle;
-    public InterstitialAdManager interstitialAdManager;
-
-    [Header("Powerup Buttons")]
-    public Button magmaCleaverButton, bladeworksButton;
-
     public int score, maxMana, currentMana;
     public Transform txtScore;
     public Transform pfab_txtScoreIncrease;
@@ -28,12 +22,8 @@ public class GameEventManager : MonoBehaviour, IManager
     private IHealthBar manaBar;
     public Transform pfab_txtManaIncrease;
 
-    public Text hiScore;
-    private int highScore;
     private Text scoreText; // The score text on the top left corner
-    
     private Transform powerupInstance;
-    
     [Header("Unlimited Bladeworks")] public Transform pfab_bladeworksPortal;
     public int bladeworksManaCost;
 
@@ -49,9 +39,6 @@ public class GameEventManager : MonoBehaviour, IManager
     private Transform jumpBoostPopup;
 
     private bool isGamePaused;
-
-    [SerializeField] private Color notEnoughManaPowerupButtonColor;
-   [SerializeField] private Color normalPowerupButtonColor;
 
     void Awake()
     {
@@ -72,32 +59,11 @@ public class GameEventManager : MonoBehaviour, IManager
         manaBar = manaBarTransform.GetComponent<ManaBar>();
         powerupInstance = null;
         isGamePaused = false;
-
-        highScore = PlayerPrefs.GetInt("hiScore", 0);
-        hiScore.text = highScore.ToString();
-        
-        StartInterstitialAd();
-        AdjustPowerupButtonVisibility();
-    }
-
-    private void StartInterstitialAd()
-    {
-        if (PlayerPrefs.GetInt("sessionCounter", 0) >= 4)
-        {
-            isGamePaused = true;
-            Time.timeScale = 0;
-            interstitialAdManager.ShowInterstitialAd();
-        }
-        else
-        {
-            isGamePaused = false;
-            Time.timeScale = 1;
-        }
     }
 
     public IEnumerator FreezeTime(float freezeDuration)
     {
-        Time.timeScale = 0.01f;
+        Time.timeScale = 0.05f;
         float freezeEndTime = Time.realtimeSinceStartup + freezeDuration;
         while (Time.realtimeSinceStartup < freezeEndTime)
         {
@@ -112,25 +78,7 @@ public class GameEventManager : MonoBehaviour, IManager
         score += earnedScore;
         scoreText.text = score.ToString();
 
-        InstantiateAddedScorePopup(earnedScore);
-
-        ModifyHiScore();
-    }
-
-    private void ModifyHiScore()
-    {
-        if (score >= highScore)
-        {
-            PlayerPrefs.SetInt("hiScore", score);
-            highScore = score;
-            hiScore.text = highScore.ToString();
-        }
-    }
-
-    private void InstantiateAddedScorePopup(int earnedScore)
-    {
-        scorePopup = GameObject.Instantiate(pfab_txtScoreIncrease, PlayerCharacter.Instance.transform.position,
-            Quaternion.identity, txtScore);
+        scorePopup = GameObject.Instantiate(pfab_txtScoreIncrease, txtScore);
 
         Text foreground = scorePopup.GetChild(0).GetComponent<Text>();
         Text background = scorePopup.GetChild(1).GetComponent<Text>();
@@ -160,7 +108,7 @@ public class GameEventManager : MonoBehaviour, IManager
 
         if (amountOfManaToAdd > 0)
         {
-            AudioManager.Instance.PlayAddedManaClip(amountOfManaToAdd);
+            AudioManager.Instance.PlayAddedManaClip();
             manaPopup = GameObject.Instantiate(pfab_txtManaIncrease, manaBarTransform.position, Quaternion.identity,
                 manaBarTransform);
 
@@ -175,7 +123,6 @@ public class GameEventManager : MonoBehaviour, IManager
 
             manaPopup.GetComponent<AddedManaText>().MovePopup();
         }
-        AdjustPowerupButtonVisibility();
     }
 
     public void StartUnlimitedBladeworks()
@@ -269,24 +216,6 @@ public class GameEventManager : MonoBehaviour, IManager
         CanvasManager.Instance.EnableSpecificPanel(TogglablePanelType.EndGame);
     }
 
-    public void ResumeGameAndHealCastleAfterAd(int repairPercentage)
-    {
-        castle.RepairCastleAfterAd(repairPercentage);
-        EnemyManager.Instance.DestroyAllEnemies();
-        CanvasManager.Instance.DisableLastActivePanel();
-        AudioManager.Instance.musicAudioSource.Play();
-        isGamePaused = true;
-        GameEventManager.Instance.ToggleFreezeGame();
-    }
-
-    public void ResumeGameAfterSkippingInterstitialAd()
-    {
-        CanvasManager.Instance.DisableLastActivePanel();
-        AudioManager.Instance.musicAudioSource.Play();
-        isGamePaused = false;
-        Time.timeScale = 1;
-    }
-
     public void OpenGameScene()
     {
         SceneManager.LoadScene(0); // First index is the SampleScene, the scene game actually takes place in
@@ -295,37 +224,5 @@ public class GameEventManager : MonoBehaviour, IManager
     public void OpenMainMenuScene()
     {
         SceneManager.LoadScene(1); // Second index is the main menu
-    }
-
-    private void AdjustPowerupButtonVisibility()
-    {
-        ColorBlock bladeworkColors = bladeworksButton.colors;
-        if (currentMana < bladeworksManaCost)
-        {
-            bladeworkColors.normalColor = notEnoughManaPowerupButtonColor; // Disabled color
-        }
-        else if (currentMana >= bladeworksManaCost)
-        {
-            bladeworkColors.normalColor = normalPowerupButtonColor; // Normal Color
-        }
-        
-        bladeworksButton.colors = bladeworkColors;
-
-        ColorBlock magmaCleaverColors = magmaCleaverButton.colors;
-        if (currentMana < magmaCleaverManaCost)
-        {
-            magmaCleaverColors.normalColor = notEnoughManaPowerupButtonColor; // Disabled color
-        }
-        else if (currentMana >= magmaCleaverManaCost)
-        {
-            magmaCleaverColors.normalColor = normalPowerupButtonColor; // Normal color
-        }
-
-        magmaCleaverButton.colors = magmaCleaverColors;
-    }
-
-    public int GetScore()
-    {
-        return score;
     }
 }

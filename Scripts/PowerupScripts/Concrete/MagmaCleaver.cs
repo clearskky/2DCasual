@@ -5,7 +5,6 @@ using UnityEngine;
 public class MagmaCleaver : MonoBehaviour, IPowerupProjectile
 {
     public int attackDamage;
-    public DamageSource damageType;
     public int rotationRate;
 
     public int secondsUntilSelfDestruct;
@@ -37,7 +36,7 @@ public class MagmaCleaver : MonoBehaviour, IPowerupProjectile
     public void OnTriggerEnter2D(Collider2D collision)
     {
         IEnemy enemy = collision.gameObject.GetComponent<IEnemy>();
-        enemy.TakeDamage(attackDamage, damageType);
+        enemy.TakeDamage(attackDamage);
     }
 
     void Die()

@@ -7,7 +7,6 @@ public class SpiritBlade : MonoBehaviour, IPowerupProjectile
 {
     public int attackDamage;
     public int movementSpeed;
-    public DamageSource damageType;
 
     private float remainingDistanceBeforeDying, previousPosY;
 
@@ -42,6 +41,6 @@ public class SpiritBlade : MonoBehaviour, IPowerupProjectile
     public void OnTriggerEnter2D(Collider2D collision)
     {
         IEnemy enemy = collision.gameObject.GetComponent<IEnemy>();
-        enemy.TakeDamage(attackDamage, damageType);
+        enemy.TakeDamage(attackDamage);
     }
 }

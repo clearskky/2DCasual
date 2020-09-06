@@ -72,16 +72,6 @@ public class Castle : MonoBehaviour, IBuilding
         GameEventManager.Instance.InitiateGameOverRoutine();
     }
 
-    public void RepairCastleAfterAd(int repairPercentage)
-    {
-        if (currentHealth < 0)
-        {
-            currentHealth = 0;
-        }
-
-        GetRepaired(repairPercentage);
-    }
-
     public void GetRepaired(int repairPercentage)
     {
         int healAmount = (maxHealth / 100) * repairPercentage;

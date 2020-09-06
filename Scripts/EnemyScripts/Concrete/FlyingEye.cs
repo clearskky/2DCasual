@@ -15,7 +15,7 @@ public class FlyingEye : MonoBehaviour, IEnemy
     private SpriteRenderer spriteRenderer;
     private Transform targetBuildingWing;
 
-    public DamageSource sourceOfLastTakenDamage;
+    
 
     void Awake()
     {
@@ -39,7 +39,7 @@ public class FlyingEye : MonoBehaviour, IEnemy
             IBuildingWing buildingWing = collision.gameObject.GetComponent<CastleWing>();
             buildingWing.RegisterDamage(attackDamage);
 
-            TakeDamage(maxHealth * 3, DamageSource.CWing);
+            InitiateDeathRoutine("castleWing");
         }
     }
 
@@ -75,36 +75,27 @@ public class FlyingEye : MonoBehaviour, IEnemy
 
     }
 
-    public void TakeDamage(int damage, DamageSource damageSource)
+    public void TakeDamage(int damage)
     {
         currentHealth -= damage;
-        sourceOfLastTakenDamage = damageSource;
+
         if (currentHealth <= 0)
         {
-            InitiateDeathRoutine();
+            InitiateDeathRoutine(null);
         }
     }
 
     // This method triggers the death animation, which executes the Die() method at the end via an animation events
-    public void InitiateDeathRoutine()
+    public void InitiateDeathRoutine(string sourceOfDeathTag)
     {
-        if (sourceOfLastTakenDamage == DamageSource.CWing)
+        AudioManager.Instance.PlayFlyingEyeDeathClip();
+
+        if (sourceOfDeathTag != "castleWing")
         {
-            AudioManager.Instance.PlayFlyingEyeDeathClip();
-            
-        }
-        else if (sourceOfLastTakenDamage == DamageSource.Powerup)
-        {
-            AudioManager.Instance.PlayFlyingEyeDeathClip();
-            GameEventManager.Instance.IncreaseScore(scoreValue);
-        }
-        else if (sourceOfLastTakenDamage == DamageSource.Player)
-        {
-            AudioManager.Instance.PlayIzanagiSwordClip();
             PlayerCharacter.Instance.enemiesKilledBeforeFalling += 1;
             GameEventManager.Instance.IncreaseScore(scoreValue * PlayerCharacter.Instance.enemiesKilledBeforeFalling);
         }
-
+            
         isAlive = false;
         animator.SetBool("isAlive", false);
         BoxCollider2D bc = GetComponent<BoxCollider2D>();
@@ -115,6 +106,7 @@ public class FlyingEye : MonoBehaviour, IEnemy
     // We let the EnemyManager know of this tragedy so it can send reinforcements
     public void Die()
     {
+        
         EnemyManager.Instance.DecrementCurrentFlyingEyeCount();
 
         if (PlayerCharacter.Instance.targetEnemyTransform == this.transform)
